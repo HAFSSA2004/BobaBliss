@@ -1,10 +1,15 @@
 "use client"
 
 import { useState } from "react"
-import { Menu, X } from "lucide-react"
+import { Menu, X, ShoppingCart, Heart } from "lucide-react"
+import Link from "next/link"
+import { useCart } from "@/hooks/use-cart"
+import { Badge } from "@/components/ui/badge"
 
 export default function Header() {
   const [isOpen, setIsOpen] = useState(false)
+  const { items, favorites } = useCart()
+  const totalItems = items.reduce((sum, item) => sum + item.quantity, 0)
 
   return (
     <header className="fixed top-0 left-0 right-0 z-50 bg-background/95 backdrop-blur-sm border-b border-border">
@@ -28,10 +33,33 @@ export default function Header() {
             <a href="#contact" className="text-foreground hover:text-primary transition-colors">
               Contact
             </a>
-            <button className="bg-primary text-primary-foreground px-6 py-2 rounded-full hover:opacity-90 transition-opacity">
-              Order Now
-            </button>
           </nav>
+
+          {/* Desktop action buttons */}
+          <div className="hidden md:flex items-center gap-4">
+            <Link href="/favorites" className="relative p-2 rounded-lg hover:bg-muted transition-colors">
+              <Heart size={20} />
+              {favorites.length > 0 && (
+                <Badge
+                  variant="destructive"
+                  className="absolute -top-1 -right-1 h-5 w-5 flex items-center justify-center p-0 text-xs"
+                >
+                  {favorites.length}
+                </Badge>
+              )}
+            </Link>
+            <Link href="/cart" className="relative p-2 rounded-lg hover:bg-muted transition-colors">
+              <ShoppingCart size={20} />
+              {totalItems > 0 && (
+                <Badge
+                  variant="destructive"
+                  className="absolute -top-1 -right-1 h-5 w-5 flex items-center justify-center p-0 text-xs"
+                >
+                  {totalItems}
+                </Badge>
+              )}
+            </Link>
+          </div>
 
           {/* Mobile menu button */}
           <button
@@ -73,9 +101,20 @@ export default function Header() {
             >
               Contact
             </a>
-            <button className="w-full bg-primary text-primary-foreground px-6 py-2 rounded-full hover:opacity-90 transition-opacity">
-              Order Now
-            </button>
+            <div className="flex gap-2 pt-2">
+              <Link
+                href="/favorites"
+                className="flex-1 bg-secondary text-secondary-foreground px-4 py-2 rounded-full hover:opacity-90 transition-opacity flex items-center justify-center gap-2"
+              >
+                <Heart size={18} /> Favorites {favorites.length > 0 && `(${favorites.length})`}
+              </Link>
+              <Link
+                href="/cart"
+                className="flex-1 bg-primary text-primary-foreground px-4 py-2 rounded-full hover:opacity-90 transition-opacity flex items-center justify-center gap-2"
+              >
+                <ShoppingCart size={18} /> Cart {totalItems > 0 && `(${totalItems})`}
+              </Link>
+            </div>
           </nav>
         )}
       </div>

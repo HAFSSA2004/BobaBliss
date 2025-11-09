@@ -2,6 +2,8 @@
 
 import { useEffect, useState } from "react"
 import ProductDetailModal from "./product-detail-modal"
+import { useCart } from "@/hooks/use-cart"
+import { Heart } from "lucide-react"
 
 const menuItems = [
   {
@@ -17,6 +19,7 @@ const menuItems = [
     ],
     details:
       "Our signature brown sugar milk tea is made with premium Assam black tea, fresh milk, and our house-made brown sugar syrup. The chewy boba pearls are cooked fresh daily to ensure perfect texture.",
+    category: "Classic",
   },
   {
     id: 2,
@@ -27,16 +30,18 @@ const menuItems = [
     images: ["/2.png", "/taro-bubble-tea-side-view.jpg", "/taro-bubble-tea-top-view.jpg"],
     details:
       "Indulge in our creamy taro bubble tea, made with real taro root and smooth condensed milk. The beautiful purple color and rich, nutty flavor make this a customer favorite.",
+    category: "Flavored",
   },
   {
     id: 3,
     name: "Mango Smoothie",
     price: "$6.50",
     description: "Fresh mango with tapioca pearls",
-    image: "6.png",
+    image: "/6.png",
     images: ["/6.png", "/mango-smoothie-fresh-fruit.jpg", "/mango-tapioca-pearls.jpg"],
     details:
       "Experience tropical bliss with our fresh mango smoothie, blended with real mango puree and topped with silky tapioca pearls. Perfect for a refreshing summer drink.",
+    category: "Smoothie",
   },
   {
     id: 4,
@@ -47,6 +52,7 @@ const menuItems = [
     images: ["/4.png", "/matcha-latte-foam-art.jpg", "/matcha-powder-whisking.jpg"],
     details:
       "Enjoy the authentic Japanese tradition with our ceremonial-grade matcha latte. Expertly whisked and topped with velvety milk foam for the perfect balance of earthy and creamy.",
+    category: "Latte",
   },
   {
     id: 5,
@@ -57,6 +63,7 @@ const menuItems = [
     images: ["/5.png", "/strawberry-banana-smoothie-blend.jpg", "/fresh-strawberries-and-bananas.jpg"],
     details:
       "A delightful combination of fresh strawberries and ripe bananas blended into a smooth, creamy drink. This fruity favorite is packed with natural sweetness and nutrition.",
+    category: "Smoothie",
   },
   {
     id: 6,
@@ -67,6 +74,7 @@ const menuItems = [
     images: ["/3.png", "/honeydew-melon-bubble-tea.jpg", "/honeydew-fresh-juice.jpg"],
     details:
       "Light, refreshing, and deliciously sweet, our honeydew bubble tea is made with real honeydew juice and premium boba. The perfect choice when you want something cool and crisp.",
+    category: "Special",
   },
 ]
 
@@ -74,6 +82,7 @@ export default function Menu() {
   const [isVisible, setIsVisible] = useState(false)
   const [selectedProduct, setSelectedProduct] = useState<(typeof menuItems)[0] | null>(null)
   const [isModalOpen, setIsModalOpen] = useState(false)
+  const { addItem, toggleFavorite, favorites } = useCart()
 
   useEffect(() => {
     setIsVisible(true)
@@ -106,44 +115,76 @@ export default function Menu() {
         </div>
 
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {menuItems.map((item, index) => (
-            <div
-              key={item.id}
-              className={`${isVisible ? "animate-fade-in" : "opacity-0"} group`}
-              style={{ animationDelay: `${index * 100}ms` }}
-            >
-              <div className="bg-card rounded-2xl overflow-hidden shadow-md hover:shadow-xl transition-all duration-300 transform hover:scale-105 h-full flex flex-col">
+          {menuItems.map((item, index) => {
+            const isFavorite = favorites.some(fav => fav.id === item.id)
+            return (
               <div
-  className="relative cursor-pointer overflow-hidden h-100 rounded-2xl"
-  onClick={() => handleImageClick(item)}
->
-  <img
-    src={item.image || "/placeholder.svg"}
-    alt={item.name}
-    className="w-full h-full object-cover transition-transform duration-300 hover:scale-105"
-  />
-  {/* Overlay */}
-  <div className="absolute inset-0 bg-black/40 flex flex-col justify-end p-4">
-    <h3 className="text-xl font-bold text-white">{item.name}</h3>
-    <p className="text-sm text-white/90">{item.description}</p>
-    <div className="flex items-center justify-between mt-2">
-      <span className="text-2xl font-bold text-white">{item.price}</span>
-      <button className="bg-accent text-accent-foreground px-4 py-2 rounded-full text-sm font-semibold hover:opacity-90 transition-opacity">
-        Add to Cart
-      </button>
-    </div>
-  </div>
-</div>
-
-
-                
+                key={item.id}
+                className={`${isVisible ? "animate-fade-in" : "opacity-0"} group`}
+                style={{ animationDelay: `${index * 100}ms` }}
+              >
+                <div className="bg-card rounded-2xl overflow-hidden shadow-md hover:shadow-xl transition-all duration-300 transform hover:scale-105 h-full flex flex-col">
+                  <div
+                    className="relative cursor-pointer overflow-hidden h-100 rounded-2xl"
+                    onClick={() => handleImageClick(item)}
+                  >
+                    <img
+                      src={item.image || "/placeholder.svg"}
+                      alt={item.name}
+                      className="w-full h-full object-cover transition-transform duration-300 hover:scale-105"
+                    />
+                    <Heart
+                      className={`absolute top-4 right-4 w-6 h-6 ${isFavorite ? 'text-red-500 fill-red-500' : 'text-white'} cursor-pointer transition-colors`}
+                      onClick={(e) => {
+                        e.stopPropagation()
+                        toggleFavorite({
+                          id: item.id,
+                          name: item.name,
+                          price: parseFloat(item.price.replace("$", "")),
+                          image: item.image,
+                          description: item.description,
+                          category: item.category,
+                          quantity: 1,
+                        })
+                      }}
+                    />
+                    {/* Overlay */}
+                    <div className="absolute inset-0 bg-black/40 flex flex-col justify-end p-4">
+                      <h3 className="text-xl font-bold text-white">{item.name}</h3>
+                      <p className="text-sm text-white/90">{item.description}</p>
+                      <div className="flex items-center justify-between mt-2">
+                        <span className="text-2xl font-bold text-white">{item.price}</span>
+                        <button
+                          onClick={() =>
+                            addItem({
+                              id: item.id,
+                              name: item.name,
+                              price: parseFloat(item.price.replace("$", "")),
+                              image: item.image,
+                              description: item.description,
+                              category: item.category,
+                              quantity: 1,
+                            })
+                          }
+                          className="bg-accent text-accent-foreground px-4 py-2 rounded-full text-sm font-semibold hover:opacity-90 transition-opacity"
+                        >
+                          Add to Cart
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
               </div>
-            </div>
-          ))}
+            )
+          })}
         </div>
       </div>
 
-      <ProductDetailModal isOpen={isModalOpen} product={selectedProduct} onClose={handleCloseModal} />
+      <ProductDetailModal
+        isOpen={isModalOpen}
+        product={selectedProduct}
+        onClose={handleCloseModal}
+      />
     </section>
   )
 }

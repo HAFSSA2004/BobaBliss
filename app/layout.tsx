@@ -1,25 +1,22 @@
-import type { Metadata } from 'next'
-import { Analytics } from '@vercel/analytics/next'
-import './globals.css'
+"use client"
 
-export const metadata: Metadata = {
-  title: 'Boba Bliss', // your website name
-  description: 'Bubble tea shop website',
-  generator: undefined, // remove V0 reference
-  applicationName: 'Boba Bliss', // optional
-  icons: undefined, // remove all icons completely
-}
+import "./globals.css"
+import { Analytics } from "@vercel/analytics/react"
+import { CartProvider } from "@/hooks/use-cart" // ✅ Make sure path is correct
 
 export default function RootLayout({
   children,
-}: Readonly<{
+}: {
   children: React.ReactNode
-}>) {
+}) {
   return (
     <html lang="en">
-      <body className={`font-sans antialiased`}>
-        {children}
-        <Analytics />
+      <body className="font-sans antialiased">
+        {/* ✅ Wrap the entire app with CartProvider */}
+        <CartProvider>
+          {children}
+          <Analytics />
+        </CartProvider>
       </body>
     </html>
   )
