@@ -2,6 +2,7 @@
 
 import { X } from "lucide-react"
 import { useState } from "react"
+import { useCart } from "@/hooks/use-cart" // import your cart hook
 
 interface ProductDetailModalProps {
   isOpen: boolean
@@ -19,11 +20,25 @@ interface ProductDetailModalProps {
 
 export default function ProductDetailModal({ isOpen, product, onClose }: ProductDetailModalProps) {
   const [selectedImageIndex, setSelectedImageIndex] = useState(0)
+  const { addItem } = useCart() // get addItem from the cart
 
   if (!isOpen || !product) return null
 
   const images = product.images || [product.image]
   const currentImage = images[selectedImageIndex]
+
+  const handleAddToCart = () => {
+    addItem({
+      id: product.id,
+      name: product.name,
+      price: parseFloat(product.price.replace("$", "")),
+      image: product.image,
+      description: product.description,
+      quantity: 1,
+      category: product.details || "" // optional, can store category or details
+    })
+    onClose() // close modal after adding to cart
+  }
 
   return (
     <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
@@ -42,11 +57,11 @@ export default function ProductDetailModal({ isOpen, product, onClose }: Product
           <div className="grid md:grid-cols-2 gap-8">
             {/* Images Section */}
             <div className="flex flex-col gap-4">
-              <div className="bg-muted rounded-xl overflow-hidden flex items-center justify-center min-h-96">
+              <div className="rounded-xl overflow-hidden flex items-center justify-center min-h-96">
                 <img
                   src={currentImage || "/placeholder.svg"}
                   alt={product.name}
-                  className="w-full h-full object-contain"
+                  className="w-full h-full object-cover"
                 />
               </div>
 
@@ -58,7 +73,9 @@ export default function ProductDetailModal({ isOpen, product, onClose }: Product
                       key={index}
                       onClick={() => setSelectedImageIndex(index)}
                       className={`w-20 h-20 rounded-lg overflow-hidden border-2 transition-colors ${
-                        selectedImageIndex === index ? "border-accent" : "border-border hover:border-muted-foreground"
+                        selectedImageIndex === index
+                          ? "border-accent"
+                          : "border-border hover:border-muted-foreground"
                       }`}
                     >
                       <img
@@ -93,7 +110,10 @@ export default function ProductDetailModal({ isOpen, product, onClose }: Product
 
               {/* Action Buttons */}
               <div className="flex gap-3 mt-8">
-                <button className="flex-1 bg-accent text-accent-foreground px-6 py-3 rounded-full font-semibold hover:opacity-90 transition-opacity">
+                <button
+                  onClick={handleAddToCart}
+                  className="flex-1 bg-accent text-accent-foreground px-6 py-3 rounded-full font-semibold hover:opacity-90 transition-opacity"
+                >
                   Add to Cart
                 </button>
                 <button

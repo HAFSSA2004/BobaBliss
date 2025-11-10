@@ -9,6 +9,13 @@ export default function Hero() {
     setIsVisible(true)
   }, [])
 
+  const scrollToMenu = () => {
+    const menuSection = document.getElementById("menu")
+    if (menuSection) {
+      menuSection.scrollIntoView({ behavior: "smooth" })
+    }
+  }
+
   return (
     <section className="pt-32 pb-20 px-4 sm:px-6 lg:px-8 relative overflow-hidden">
       <div className="max-w-7xl mx-auto">
@@ -38,12 +45,13 @@ export default function Hero() {
             </div>
 
             <div className="flex flex-col sm:flex-row gap-4">
-              <button className="bg-primary text-primary-foreground px-8 py-4 rounded-full font-semibold hover:opacity-90 transition-opacity shadow-lg hover:shadow-xl">
+              <button
+                onClick={scrollToMenu}
+                className="bg-primary text-primary-foreground px-8 py-4 rounded-full font-semibold hover:opacity-90 transition-opacity shadow-lg hover:shadow-xl"
+              >
                 Order Now
               </button>
-              <button className="border-2 border-primary text-primary px-8 py-4 rounded-full font-semibold hover:bg-primary hover:text-primary-foreground transition-all">
-                Learn More
-              </button>
+              
             </div>
 
             <div className="flex gap-8 pt-6">

@@ -37,17 +37,7 @@ export default function Header() {
 
           {/* Desktop action buttons */}
           <div className="hidden md:flex items-center gap-4">
-            <Link href="/favorites" className="relative p-2 rounded-lg hover:bg-muted transition-colors">
-              <Heart size={20} />
-              {favorites.length > 0 && (
-                <Badge
-                  variant="destructive"
-                  className="absolute -top-1 -right-1 h-5 w-5 flex items-center justify-center p-0 text-xs"
-                >
-                  {favorites.length}
-                </Badge>
-              )}
-            </Link>
+            
             <Link href="/cart" className="relative p-2 rounded-lg hover:bg-muted transition-colors">
               <ShoppingCart size={20} />
               {totalItems > 0 && (
